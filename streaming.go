@@ -122,8 +122,6 @@ type StreamingClient struct {
 
 // Close closes the underlying websocket connection.
 func (s *StreamingClient) Close() error {
-	close(s.messages)
-	close(s.errors)
 	return s.connection.Close()
 }
 
@@ -189,6 +187,9 @@ func NewUnauthenticatedStreamingClient(userPrincipal *UserPrincipal) (*Streaming
 
 	// Pass messages and errors down the respective channels.
 	go func() {
+		defer close(streamingClient.errors)
+		defer close(streamingClient.messages)
+
 		for {
 			_, message, err := streamingClient.connection.ReadMessage()
 			if err != nil {
