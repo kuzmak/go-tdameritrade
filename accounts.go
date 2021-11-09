@@ -436,13 +436,19 @@ func (s *AccountsService) GetOrder(ctx context.Context, accountID, orderID strin
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s *AccountsService) GetOrderByPath(ctx context.Context, accountID string, orderParams *OrderParams) (*Response, error) {
+func (s *AccountsService) GetOrderByPath(ctx context.Context, accountID string, orderParams *OrderParams) (*Orders, *Response, error) {
 	u := fmt.Sprintf("accounts/%s/orders", accountID)
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return s.client.Do(ctx, req, nil)
+	ords := new(Orders)
+	resp, err := s.client.Do(ctx, req, ords)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return ords, resp, nil
 }
 
 func (s *AccountsService) GetOrdersByQuery(ctx context.Context, orderParams *OrderParams) (*Orders, *Response, error) {
