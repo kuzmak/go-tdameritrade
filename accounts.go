@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/google/go-querystring/query"
+	"github.com/shopspring/decimal"
 )
 
 type Accounts []*Account
@@ -211,7 +212,7 @@ type Order struct {
 	StopType                 string                `json:"stopType,omitempty"`
 	PriceLinkBasis           string                `json:"priceLinkBasis,omitempty"`
 	PriceLinkType            string                `json:"priceLinkType,omitempty"`
-	Price                    float64               `json:"price,omitempty"`
+	Price                    decimal.Decimal       `json:"price,omitempty"`
 	TaxLotMethod             string                `json:"taxLotMethod,omitempty"`
 	OrderLegCollection       []*OrderLegCollection `json:"orderLegCollection"`
 	ActivationPrice          float64               `json:"activationPrice,omitempty"`
