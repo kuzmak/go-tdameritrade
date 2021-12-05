@@ -34,11 +34,11 @@ type OptionA struct {
 	Cusip              string               `json:"cusip,omitempty"`
 	Symbol             string               `json:"symbol"`
 	Description        string               `json:"description,omitempty"`
-	Type               string               `json:"type"`
-	PutCall            string               `json:"putCall"`
-	UnderlyingSymbol   string               `json:"underlyingSymbol"`
-	OptionMultiplier   float64              `json:"optionMultiplier"`
-	OptionDeliverables []*OptionDeliverable `json:"optionDeliverables"`
+	Type               string               `json:"type,omitempty"`
+	PutCall            string               `json:"putCall,omitempty"`
+	UnderlyingSymbol   string               `json:"underlyingSymbol,omitempty"`
+	OptionMultiplier   float64              `json:"optionMultiplier,omitempty"`
+	OptionDeliverables []*OptionDeliverable `json:"optionDeliverables,omitempty"`
 }
 
 type MutualFund struct {
