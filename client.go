@@ -9,12 +9,16 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"strings"
 )
 
 const (
 	baseURL = "https://api.tdameritrade.com/v1/"
+
+	// the following variable used to set custom values in context.Context
+	DumpHttpResponseContent = "DumpHttpResponseContent"
 )
 
 // A Client manages communication with the TD-Ameritrade API.
@@ -81,6 +85,12 @@ func (c *Client) UpdateBaseURL(baseURL string) error {
 	return nil
 }
 
+// The following custom value can be added to context before invoking client methods:
+// DumpHttpResponseContent - will print TDA's http response, used for troubleshooting
+//
+// Usage example:
+// ctx = context.WithValue(ctx, tdameritrade.DumpHttpResponseContent, true)
+// tdameritrade.Client.Chains.GetChains(ctx, queryValues)
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
 	if ctx == nil {
 		return nil, errors.New("context must be non-nil")
@@ -102,22 +112,27 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 
 	defer resp.Body.Close()
 
+	dumpResponse := ctx.Value(DumpHttpResponseContent)
+	if dumpResponse != nil && dumpResponse.(bool) {
+		data, _ := httputil.DumpResponse(resp, true)
+		fmt.Println(string(data))
+	}
+
 	if err := checkResponse(resp); err != nil {
 		return nil, err
 	}
 
 	response := newResponse(resp)
 
-	// write to v for that good shit
+	// write to v
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
 			_, _ = io.Copy(w, resp.Body)
 		} else {
-			decErr := json.NewDecoder(resp.Body).Decode(v)
+ 			decErr := json.NewDecoder(resp.Body).Decode(v)
 			if decErr == io.EOF {
 				decErr = nil // ignore EOF errors caused by empty response body
-			}
-			if decErr != nil {
+			} else {
 				err = decErr
 			}
 		}
