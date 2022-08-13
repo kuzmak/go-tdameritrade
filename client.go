@@ -118,11 +118,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		fmt.Println(string(data))
 	}
 
-	if err := checkResponse(resp); err != nil {
-		return nil, err
-	}
-
 	response := newResponse(resp)
+	if err := checkResponse(resp); err != nil {
+		return response, err
+	}
 
 	// write to v
 	if v != nil {
